@@ -104,8 +104,10 @@ public class Main {
                     }
                     break;
                 case 5 :
+
                     HashMap ingredientsForNewRecipe = new HashMap();
-                    ingredientsForNewRecipe.put("beurre", 1);
+                    ingredientsForNewRecipe.put("beurre", 10);
+                    ingredientsForNewRecipe.put("steack", 10);
                     Recipe newRecipeToAdd = new Recipe(null, "Steack", "Cuire les Patates", "Plat", ingredientsForNewRecipe);
                     try {
                         newRecipeToAdd = recipeDao.create(newRecipeToAdd);

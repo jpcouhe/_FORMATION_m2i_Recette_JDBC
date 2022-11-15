@@ -91,6 +91,10 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
 
         @Override
     public Recipe create(Recipe element) throws SQLException {
+
+        HashMap ingredientsTemps = element.getRecipeIngredients();
+
+
         String query = "INSERT INTO `recipes` (`name`, `description`, `Id_category`) VALUES (?,?,?);";
         Recipe recipe = null;
         try(PreparedStatement pst = ConnectionManager.getConnectionInstance().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
@@ -116,27 +120,35 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
                     String name = resultSet.getString("name");
 
 
-
-
                     if(element.getRecipeIngredients().containsKey(resultSet.getString("name"))){
                         idOfIngredient = resultSet.getInt("Id_ingredients");
-                        /*keyOfIngredient = resultSet.getString("name");*/
+
+                        String setTableRecipeAndIngredients = "INSERT INTO `recipes_ingredients` (`Id_recipe`, `Id_ingredients`, `quantity`) VALUES (?, ?, ?);";
+                        try(PreparedStatement pst1 = ConnectionManager.getConnectionInstance().prepareStatement(setTableRecipeAndIngredients)){
+                            pst1.setLong(1,autoIncreKey );
+                            pst1.setLong(2,idOfIngredient);
+                            pst1.setInt(3, (Integer) element.getRecipeIngredients().get(resultSet.getString("name")));
+                            pst1.executeUpdate();
+                        }catch (SQLException e){
+                            throw new RuntimeException(e);
+                        }
+
+
+                        ingredientsTemps.remove(resultSet.getString("name"));
 
                     }else{
                         System.out.println("Nous sommes ici");
-                       /* idOfIngredient = 1;*/
-                    }
-
-                    String setTableRecipeAndIngredients = "INSERT INTO `recipes_ingredients` (`Id_recipe`, `Id_ingredients`, `quantity`) VALUES (?, ?, ?);";
-                    try(PreparedStatement pst1 = ConnectionManager.getConnectionInstance().prepareStatement(setTableRecipeAndIngredients)){
-                        pst1.setLong(1,autoIncreKey );
-                        pst1.setLong(2,idOfIngredient);
-                        pst1.setInt(3, 3);
-                        pst1.executeUpdate();
-                    }catch (SQLException e){
-                        throw new RuntimeException(e);
                     }
                 }
+
+
+
+
+                if(ingredientsTemps.size() > 0){
+                    System.out.println("Nous sommes ici maintenant");
+                }
+
+
 
             }catch (SQLException e){
                 throw new RuntimeException(e);
@@ -150,9 +162,6 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
                 null,
                 element.getRecipeIngredients()
             );
-
-
-
 
             ConnectionManager.getConnectionInstance().commit();
         }catch (SQLException e){
