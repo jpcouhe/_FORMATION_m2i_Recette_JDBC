@@ -1,5 +1,8 @@
 package com.recette;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
@@ -41,10 +44,11 @@ public class Main {
             choice = sc.nextInt();
             switch (choice){
                 case 1 :
-                   recipeDao.findAll().forEach(new Consumer<Recipe>() {
+
+                    recipeDao.findAll().forEach(new Consumer<Recipe>() {
                        @Override
                        public void accept(Recipe recipe) {
-                           System.out.println(recipe);
+                           System.out.println(recipe.toString());
                            System.out.println("--------------");
                        }
                    });
@@ -84,19 +88,39 @@ public class Main {
                     System.out.println("Se déconnecter");
                     break;
                 case 3 :
-                    System.out.println(recipeDao.findAll());
+                    recipeDao.findAll().forEach(recipe -> {
+                        System.out.println(recipe.toString());
+                        System.out.println("---------------");
+                    });
                     break;
                 case 4 :
-                    System.out.println(recipeDao.findByKeyword("abricots"));
+                    System.out.println("Veuillez renseigner un mot clé");
+                    String keyword = sc.next();
+                    List<Recipe> listRecipe = recipeDao.findByKeyword(keyword);
+                    if(listRecipe.size() > 0){
+                        listRecipe.forEach(recipe -> System.out.println(recipe.toString()));
+                    }else{
+                        System.out.println("Aucune recette trouvée !");
+                    }
                     break;
                 case 5 :
-                    System.out.println("Ajouter une recette");
+                    HashMap ingredientsForNewRecipe = new HashMap();
+                    ingredientsForNewRecipe.put("beurre", 1);
+                    Recipe newRecipeToAdd = new Recipe(null, "Steack", "Cuire les Patates", "Plat", ingredientsForNewRecipe);
+                    try {
+                        newRecipeToAdd = recipeDao.create(newRecipeToAdd);
+                        System.out.println(newRecipeToAdd);
+                        System.out.println("-----------------------");
+                    } catch (SQLException e) {
+                        System.out.println("Impossible de creer la recette");
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 6 :
                     System.out.println("Récupérer une recette aléatoirement");
                     break;
                 case 7 :
-                    System.out.println("Quiter");
+                    System.out.println("Quitter");
                     break;
 
             }

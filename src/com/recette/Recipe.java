@@ -11,6 +11,9 @@ public class Recipe {
     public HashMap recipeIngredients;
 
 
+
+
+
     public Recipe(Long recipeId, String recipeName, String description, String categoryName, HashMap recipeIngredients) {
         this.recipeId = recipeId;
         this.recipeName = recipeName;
@@ -61,9 +64,6 @@ public class Recipe {
 
     @Override
     public String toString() {
-        return "Recette : " + recipeName + "\n" +
-                "description : \n" + description + '\n' +
-                "Catégorie : " + categoryName + '\n' +
-                "Ingrédients : \n" + recipeIngredients;
+        return "Recette : " + recipeName + " description : " + description + " Catégorie : " + categoryName + " Ingrédients : " + recipeIngredients ;
     }
 }
