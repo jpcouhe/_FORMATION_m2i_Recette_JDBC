@@ -22,20 +22,17 @@ public class Main {
         while (choice != 3){
             System.out.println("Bonjour, que voulez vous faire? \n" + "1 - Ne pas se connecter \n" + "2 - Se connecter \n" + "3 - Quitter");
             choice = sc.nextInt();
+            User user = new User();
             switch (choice){
                 case 1 :
                     displayMenuNotConnected();
                     break;
                 case 2 :
-                   /* System.out.println("Quel est votre adresse mail?");
+                    System.out.println("Quel est votre adresse mail?");
                     String email = readString();
                     System.out.println("Quel est votre mot de passe?");
-                    String password = readString();*/
-
-                    User user = new User();
-                    user.login("jp.couhe@gmail.com", "1234");
-
-                    /*user.login(email,password);*/
+                    String password = readString();
+                    user.login(email,password);
                     if(user.isAuth()){
                         displayMenuConnected();
                     }else{
@@ -58,6 +55,10 @@ public class Main {
         while (choice != 4){
             System.out.println("1 - Visualiser les recettes \n" + "2 - S'inscrire \n" + "3 - Se connecter \n" + "4 - Quitter");
             choice = sc.nextInt();
+            User user = new User();
+            String email;
+            String password;
+
             switch (choice){
                 case 1 :
 
@@ -70,17 +71,38 @@ public class Main {
                    });
                     break;
                 case 2 :
-                    System.out.println("S'inscrire");
+                    System.out.println("Quel est votre prénom ?");
+                    String firstName = readString();
+                    System.out.println("Quel est votre nom ?");
+                    String lastName = readString();
+                    System.out.println("Quel est votre adresse mail ?");
+                    email = readString();
+                    System.out.println("Quel est votre password ?");
+                    password = readString();
+
+                    try {
+                        user.signup(firstName,lastName, email, password );
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    user.login(email, password);
+                    if(user.isAuth()){
+                        displayMenuConnected();
+                    }else{
+                        System.out.println("Connection impossible");
+                    }
+
+
                     break;
                 case 3 :
-                        /*  System.out.println("Quel est votre adresse mail?");
-                    String email = readString();
+                    System.out.println("Quel est votre adresse mail?");
+                    email = readString();
                     System.out.println("Quel est votre mot de passe?");
-                    String password = readString();*/
+                    password = readString();
 
-                    User user = new User();
-                    /*   user.login(email,password);*/
-                    user.login("jp.couhe@gmail.com", "1234");
+                    user.login(email,password);
+
                     if(user.isAuth()){
                         displayMenuConnected();
                     }else{

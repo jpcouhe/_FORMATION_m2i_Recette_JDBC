@@ -5,6 +5,7 @@ import com.recette.ConnectionManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class User implements UserInterface<User> {
     static int id;
@@ -41,24 +42,23 @@ public class User implements UserInterface<User> {
     }
 
     @Override
-    public User signup(String firstName, String lastName, String email, String password) {
-        return null;
+    public void signup(String firstName, String lastName, String email, String password) throws SQLException {
+        String query = "INSERT INTO `users` (`lastName`, `email`, `firstName`, `password`) VALUES (?,?,?,?)";
+        try(PreparedStatement pst = ConnectionManager.getConnectionInstance().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);){
+            pst.setString(1, email);
+            pst.setString(2, password);
+            pst.setString(3, email);
+            pst.setString(4, password);
+            pst.executeUpdate();
+            ConnectionManager.getConnectionInstance().commit();
+        } catch (SQLException e) {
+            ConnectionManager.getConnectionInstance().rollback();
+            throw new RuntimeException(e);
+        }
     }
 
     public static int getId() {
         return id;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public boolean isAuth() {
