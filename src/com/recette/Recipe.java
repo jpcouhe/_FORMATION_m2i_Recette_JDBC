@@ -64,6 +64,6 @@ public class Recipe {
 
     @Override
     public String toString() {
-        return "Recette : " + recipeName + " description : " + description + " Catégorie : " + categoryName + " Ingrédients : " + recipeIngredients ;
+        return "Recette numéro: " + recipeId + " nom : " + recipeName + " description : " + description + " Catégorie : " + categoryName + " Ingrédients : " + recipeIngredients ;
     }
 }

@@ -1,13 +1,12 @@
 package com.recette;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 public class RecipeJdbcDao implements CrudDAO<Recipe> {
     @Override
@@ -92,6 +91,8 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
         @Override
     public Recipe create(Recipe element) throws SQLException {
 
+
+        //Clone liste ingrédient fourni par l'utilisateur
         HashMap ingredientsTemps = element.getRecipeIngredients();
 
 
@@ -110,16 +111,15 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
             }
 
 
+
+            // Recupération de la liste de tout les ingrédients
             String getAllingredients = "SELECT * FROM `ingredients`";
 
             try(Statement st = ConnectionManager.getConnectionInstance().createStatement()){
                 ResultSet resultSet = st.executeQuery(getAllingredients);
                 while(resultSet.next()){
                     int idOfIngredient =0;
-
-                    String name = resultSet.getString("name");
-
-
+                    // Si ingrédient fourni par utilisateur déja dans notre table
                     if(element.getRecipeIngredients().containsKey(resultSet.getString("name"))){
                         idOfIngredient = resultSet.getInt("Id_ingredients");
 
@@ -133,27 +133,43 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
                             throw new RuntimeException(e);
                         }
 
-
+                        // Mise à jour du clone de la liste
                         ingredientsTemps.remove(resultSet.getString("name"));
-
-                    }else{
-                        System.out.println("Nous sommes ici");
                     }
                 }
 
-
-
+                // Si notre clone d'ingrédient contient encore des ingrédients, ils ne sont pas dans notre table. Alors on les crée.
 
                 if(ingredientsTemps.size() > 0){
-                    System.out.println("Nous sommes ici maintenant");
+                    Iterator iterator = ingredientsTemps.entrySet().iterator();
+                    while(iterator.hasNext()){
+                        Map.Entry mapentry = (Map.Entry) iterator.next();
+                        String saveIngredient = "INSERT INTO `ingredients` (`name`) VALUES (?)";
+                        try(PreparedStatement pstSaveIngredient = ConnectionManager.getConnectionInstance().prepareStatement(saveIngredient, Statement.RETURN_GENERATED_KEYS)) {
+                            pstSaveIngredient.setString(1, (String) mapentry.getKey());
+                            Long idOfCreateIngredient = -1L;
+                            pstSaveIngredient.executeUpdate();
+                            ResultSet resultSetOfCreateIngredient = pstSaveIngredient.getGeneratedKeys();
+                            if(resultSetOfCreateIngredient.next()){
+                                idOfCreateIngredient = resultSetOfCreateIngredient.getLong(1);
+                            }
+                            String setTableRecipeAndIngredients = "INSERT INTO `recipes_ingredients` (`Id_recipe`, `Id_ingredients`, `quantity`) VALUES (?, ?, ?);";
+                            try(PreparedStatement pstInsert = ConnectionManager.getConnectionInstance().prepareStatement(setTableRecipeAndIngredients)){
+                                pstInsert.setLong(1,autoIncreKey );
+                                pstInsert.setLong(2,idOfCreateIngredient);
+                                pstInsert.setInt(3, (Integer) mapentry.getValue());
+                                pstInsert.executeUpdate();
+                            }catch (SQLException e){
+                                throw new RuntimeException(e);
+                            }
+                        }catch (SQLException e){
+                            throw new RuntimeException(e);
+                        }
+                    }
                 }
-
-
-
             }catch (SQLException e){
                 throw new RuntimeException(e);
             }
-
 
             recipe = new Recipe(
                 autoIncreKey,
@@ -170,6 +186,22 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
         }
         return recipe;
     }
+
+    @Override
+    public void cookedAt(int id, LocalDate date) throws SQLException {
+        String query = "INSERT INTO `users_recipes` (`Id_users`, `Id_recipe`, `cookedAt`) VALUES (?, ?, ?)";
+        try(PreparedStatement pst = ConnectionManager.getConnectionInstance().prepareStatement(query)) {
+            pst.setInt(1, User.getId());
+            pst.setInt(2, id);
+            pst.setDate(3, Date.valueOf(date));
+            pst.executeUpdate();
+            ConnectionManager.getConnectionInstance().commit();
+        }catch (SQLException e){
+            ConnectionManager.getConnectionInstance().rollback();
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public HashMap getIngredientByRecipe(int id){
 

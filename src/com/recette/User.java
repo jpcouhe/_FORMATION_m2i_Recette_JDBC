@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class User implements UserInterface<User>{
-    int id;
+    static int id;
     String lastName;
     String firstName;
     String email;
@@ -44,7 +44,7 @@ public class User implements UserInterface<User>{
         return null;
     }
 
-    public int getId() {
+    static int getId() {
         return id;
     }
 
