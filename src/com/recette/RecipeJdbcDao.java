@@ -36,11 +36,59 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
     }
 
     @Override
-    public Optional<Recipe> findById(Long id) {
+    public Optional<Recipe> findById(int id) {
+        String query = "SELECT `Id_recipe`, recipes.name, description, categories.name AS categories_name FROM `recipes` JOIN categories ON recipes.Id_category = categories.Id_category WHERE id = ?";
+        try(PreparedStatement pst = ConnectionManager.getConnectionInstance().prepareStatement(query)) {
+            pst.setInt(1, id);
+            ResultSet resultSet = pst.executeQuery();
+            while (resultSet.next()) {
+
+                HashMap ingredientList = getIngredientByRecipe(resultSet.getInt("Id_recipe"));
+
+                Recipe recipe = new Recipe(
+                        resultSet.getLong("Id_recipe"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getString("categories_name"),
+                        ingredientList
+                );
+
+                return Optional.of(recipe);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return Optional.empty();
     }
 
     @Override
+    public List<Recipe> findByKeyword(String keyword) {
+        List<Recipe> recipesList = new ArrayList<>();
+        String query = "SELECT `Id_recipe`, recipes.name, description, categories.name AS categories_name FROM `recipes` JOIN categories ON recipes.Id_category = categories.Id_category WHERE `description` LIKE '%' ? '%'";
+        try (PreparedStatement pst = ConnectionManager.getConnectionInstance().prepareStatement(query)) {
+            pst.setString(1, keyword);
+            ResultSet resultSet = pst.executeQuery();
+            while(resultSet.next()){
+                HashMap ingredientList = getIngredientByRecipe(resultSet.getInt("Id_recipe"));
+
+                Recipe recipe = new Recipe(
+                        resultSet.getLong("Id_recipe"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getString("categories_name"),
+                        ingredientList
+                );
+                recipesList.add(recipe);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return recipesList;
+    }
+
+        @Override
     public Recipe create(Recipe element) {
         return null;
     }

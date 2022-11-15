@@ -7,10 +7,6 @@ public class Main {
 
     public static void main(String[] args) {
         displayMenu();
-     /*   crudDAO<Recipe> recipeDao = DaoFactory.getRecipeDao();
-        recipeDao.findAll();
-        System.out.println(recipeDao.findAll());
-        System.out.println("Hello world!");*/
     }
 
     public static void displayMenu(){
@@ -57,9 +53,13 @@ public class Main {
                     System.out.println("S'inscrire");
                     break;
                 case 3 :
-                   /* Recipe recipeToCreate = getInfoRecipe();*/
-                    System.out.println("Se connecter");
-                    displayMenuConnected();
+                    User user = new User();
+                    user.login("jp.couhe@gmail.com", "1234");
+                    if(user.isAuth()){
+                        displayMenuConnected();
+                    }else{
+                        System.out.println("Connection impossible");
+                    }
                     break;
                 case 4 :
                     System.out.println("Quitter");
@@ -74,7 +74,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int choice = 0;
         while (choice != 7){
-            System.out.println("1 - Editer son profil \n" + "2 - Se déconnecter \n" + "3 - Visualiser les recettes \n" + "4 - Rechercher par critère \n" + "5 - Ajouter une recette \n" + "6 - Récupérer une recette aléatoirement \n" + "7 - Quitter" );
+            System.out.println("1 - Editer son profil \n" + "2 - Se déconnecter \n" + "3 - Visualiser les recettes \n" + "4 - Rechercher par mot-clé \n" + "5 - Ajouter une recette \n" + "6 - Récupérer une recette aléatoirement \n" + "7 - Quitter" );
             choice = sc.nextInt();
             switch (choice){
                 case 1 :
@@ -87,7 +87,7 @@ public class Main {
                     System.out.println(recipeDao.findAll());
                     break;
                 case 4 :
-                    System.out.println("Rechercher par critère");
+                    System.out.println(recipeDao.findByKeyword("abricots"));
                     break;
                 case 5 :
                     System.out.println("Ajouter une recette");

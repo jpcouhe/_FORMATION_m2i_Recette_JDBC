@@ -5,9 +5,8 @@ import java.util.Optional;
 
 public interface CrudDAO<E> {
     List<E> findAll();
-
-    Optional<E> findById(Long id);
-
+    Optional<E> findById(int id);
+    List<E> findByKeyword(String keyword);
     E create(E element);
 
 }

@@ -17,7 +17,6 @@ private ConnectionManager(){}
                 loadDriver();
                 CONNECTION_INSTANCE = DriverManager.getConnection("jdbc:mysql://localhost:3306/cooking_app?serverTimezone=UTC", "root", "root");
                 CONNECTION_INSTANCE.setAutoCommit(false);
-                System.out.println("Connection OK");
             }catch(SQLException e) {
                 System.err.println("Connection impossible");
             }
