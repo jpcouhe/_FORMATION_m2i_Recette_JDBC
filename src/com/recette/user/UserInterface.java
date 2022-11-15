@@ -1,4 +1,4 @@
-package com.recette;
+package com.recette.user;
 
 public interface UserInterface<E> {
     void login(String email, String password);

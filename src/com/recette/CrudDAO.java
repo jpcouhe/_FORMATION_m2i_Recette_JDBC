@@ -11,4 +11,6 @@ public interface CrudDAO<E> {
     List<E> findByKeyword(String keyword);
     E create(E element) throws SQLException;
     void cookedAt(int id, LocalDate date) throws SQLException;
+
+    E findRandomRecipe();
 }

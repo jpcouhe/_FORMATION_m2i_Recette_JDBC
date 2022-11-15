@@ -1,5 +1,7 @@
 package com.recette;
 
+import com.recette.user.User;
+
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -25,7 +27,20 @@ public class Main {
                     displayMenuNotConnected();
                     break;
                 case 2 :
-                    displayMenuConnected();
+                   /* System.out.println("Quel est votre adresse mail?");
+                    String email = readString();
+                    System.out.println("Quel est votre mot de passe?");
+                    String password = readString();*/
+
+                    User user = new User();
+                    user.login("jp.couhe@gmail.com", "1234");
+
+                    /*user.login(email,password);*/
+                    if(user.isAuth()){
+                        displayMenuConnected();
+                    }else{
+                        System.out.println("Connection impossible");
+                    }
                     break;
                 case 3 :
                     System.out.println("Fermeture du programme");
@@ -58,7 +73,13 @@ public class Main {
                     System.out.println("S'inscrire");
                     break;
                 case 3 :
+                        /*  System.out.println("Quel est votre adresse mail?");
+                    String email = readString();
+                    System.out.println("Quel est votre mot de passe?");
+                    String password = readString();*/
+
                     User user = new User();
+                    /*   user.login(email,password);*/
                     user.login("jp.couhe@gmail.com", "1234");
                     if(user.isAuth()){
                         displayMenuConnected();
@@ -126,7 +147,7 @@ public class Main {
                     int nbOfIngredients = sc.nextInt();
                     while(nbOfIngredients > 0){
                         System.out.println("Quel est le nom de l'ingrédient ?");
-                        String nameOfIngredient = sc.next();
+                        String nameOfIngredient = readString();
                         System.out.println("Quelle est la quantité? ");
                         int quantityOfIngredient = sc.nextInt();
                         ingredientsForNewRecipe.put(nameOfIngredient, quantityOfIngredient);
@@ -142,7 +163,7 @@ public class Main {
                     }
                     break;
                 case 6 :
-                    System.out.println("Récupérer une recette aléatoirement");
+                    System.out.println(recipeDao.findRandomRecipe());
                     break;
                 case 7 :
                     System.out.println("Quelle recette avez-vous cuisiné? ");

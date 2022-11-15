@@ -10,7 +10,6 @@ import java.sql.SQLException;
 public final class ConnectionManager {
 private static Connection CONNECTION_INSTANCE;
 private ConnectionManager(){}
-
     public static Connection getConnectionInstance() {
         if(CONNECTION_INSTANCE == null){
             try{
@@ -23,7 +22,6 @@ private ConnectionManager(){}
         }
         return CONNECTION_INSTANCE;
     }
-
     private static void loadDriver(){
         try {
             DriverManager.registerDriver(new Driver());
@@ -33,8 +31,6 @@ private ConnectionManager(){}
             System.err.println("Driver MySQL introuvable");
         }
     }
-
-
     public static void closeConnection(){
         try {
             CONNECTION_INSTANCE.close();

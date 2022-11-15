@@ -1,5 +1,7 @@
 package com.recette;
 
+import com.recette.user.User;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -202,6 +204,32 @@ public class RecipeJdbcDao implements CrudDAO<Recipe> {
         }
     }
 
+    @Override
+    public Recipe findRandomRecipe() {
+        String query = "SELECT recipes.Id_recipe, recipes.name, recipes.description, categories.name AS categories_name FROM `recipes` JOIN categories ON recipes.Id_category = categories.Id_category LEFT JOIN users_recipes ON recipes.Id_recipe = users_recipes.Id_recipe WHERE users_recipes.Id_users IS NULL OR (users_recipes.Id_users = ? AND users_recipes.cookedAt >= ?) ORDER BY RAND() LIMIT 1;";
+        Recipe recipe = null;
+        try(PreparedStatement pst = ConnectionManager.getConnectionInstance().prepareStatement(query)) {
+            pst.setInt(1,User.getId());
+            pst.setDate(2, Date.valueOf(LocalDate.now().minusDays(6)));
+            ResultSet resultSet = pst.executeQuery();
+            while (resultSet.next()){
+
+                HashMap ingredientList = getIngredientByRecipe(resultSet.getInt("Id_recipe"));
+                recipe = new Recipe(
+                        resultSet.getLong("Id_recipe"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getString("categories_name"),
+                        ingredientList
+                );
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return recipe;
+    }
 
     public HashMap getIngredientByRecipe(int id){
 

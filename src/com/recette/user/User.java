@@ -1,11 +1,12 @@
-package com.recette;
+package com.recette.user;
+
+import com.recette.ConnectionManager;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-public class User implements UserInterface<User>{
+public class User implements UserInterface<User> {
     static int id;
     String lastName;
     String firstName;
@@ -44,7 +45,7 @@ public class User implements UserInterface<User>{
         return null;
     }
 
-    static int getId() {
+    public static int getId() {
         return id;
     }
 
